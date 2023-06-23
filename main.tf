@@ -103,7 +103,7 @@ module "web1" {
 
     instance_name = var.instance_names[0]
     machine_type = var.machine_type
-    zone = var.zone_instance
+    zone = var.zone
     allow_stopping_for_update = var.allow_stopping_for_update
     image = var.image
     network = module.vpc.network_name
@@ -117,7 +117,7 @@ module "web2" {
 
     instance_name = var.instance_names[1]
     machine_type = var.machine_type
-    zone = var.zone_instance
+    zone = var.zone
     allow_stopping_for_update = var.allow_stopping_for_update
     image = var.image
     network = module.vpc.network_name
@@ -132,7 +132,7 @@ module "database-server" {
 
     instance_name = var.instance_names[2]
     machine_type = var.machine_type
-    zone = var.zone_instance
+    zone = var.zone
     allow_stopping_for_update = var.allow_stopping_for_update
     image = var.image
     network = module.vpc.network_name
