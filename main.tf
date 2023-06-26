@@ -44,44 +44,42 @@ module "vpc" {
 }
 
 # 4 - Internet gateway
-resource "google_compute_router" "example_router" {
+
+module "router" {
+  source = "./modules/compute_router"
+
   name    = var.router_name
   network = module.vpc.network_name
 
   depends_on = [module.vpc]
 }
 
-resource "google_compute_router_nat" "example_nat" {
+module "router_nat" {
+  source = "./modules/compute_router_nat"
+
   name               = var.nat_name
   region             = var.region
-  router             = google_compute_router.example_router.name
-  nat_ip_allocate_option = "AUTO_ONLY"
+  router             = module.router.name
+
+  depends_on = [module.router]
 }
 
-resource "google_compute_router_nat_log_config" "example_nat_log_config" {
-  router_nat_id  = google_compute_router_nat.example_nat.id
-  filter         = "ERRORS_ONLY"
+module "router_nat_log_config" {
+  source = "./modules/compute_router_nat_log_config"
+
+  router_nat_id  = module.router_nat.id
+
+  depends_on = [module.router_nat]
 }
 
 # 5 - Security groups (or firewall rules for the three subnets)
-resource "google_compute_firewall" "example_firewall" {
+
+module "firewall" {
+  source = "./modules/firewall"
+
   name    = var.firewall_name
   network = module.vpc.network_name
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80"]
-  }
-
+  
   depends_on = [module.vpc]
 }
 
@@ -91,10 +89,10 @@ resource "google_compute_route" "subnet_default_route" {
   name              = "subnet-default-route-${var.subnetworks[count.index]}"
   dest_range        = "0.0.0.0/0"
   network           = module.vpc.network_name
-  next_hop_gateway  = google_compute_router.example_router.self_link
+  next_hop_gateway  = module.router.self_link
   priority          = count.index * 10
 
-  depends_on = [module.vpc]
+  depends_on = [module.vpc , module.router]
 }
 
 # 7 - Web server instances
