@@ -1,3 +1,11 @@
+# Remote backend (Google Cloud Storage bucket)
+terraform {
+  backend "gcs" {
+    bucket  = "mybucket-alfonso"
+    prefix  = "terraform/state"
+  }
+}
+
 # 1 - Cloud Storage Bucket
 module "bucket" {
   source = "./modules/storage"
